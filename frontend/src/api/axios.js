@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://telesoft-2ubl.onrender.com',
+  baseURL: 'https://telesoft-2ubl.onrender.com/api',
   headers: {
     'Content-Type': 'application/json',
   },

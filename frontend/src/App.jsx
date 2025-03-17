@@ -1,11 +1,11 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import Dashboard from './pages/Dashboard'
-import AddBook from './pages/AddBook'
-import BookDetails from './pages/BookDetails'
-import ProtectedRoute from './components/ProtectedRoute'
-import AdminRoute from './components/AdminRoute'
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import AddBook from './pages/AddBook';
+import BookDetails from './pages/BookDetails';
+import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
 
 function App() {
   return (
@@ -25,7 +25,7 @@ function App() {
       } />
       <Route path="/book/:id" element={<BookDetails />} />
     </Routes>
-  )
+  );
 }
 
-export default App
+export default App;

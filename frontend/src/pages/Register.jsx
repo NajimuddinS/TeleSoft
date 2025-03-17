@@ -1,21 +1,27 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../utils/axios';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
+import api from '../api/axios';
 
 function Register() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
+    username: '',
     password: '',
-    role: 'user'
+    role: 'user' // Default role is user
   });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/api/auth/register', formData);
+      await api.post('/auth/register', formData);
       toast.success('Registration successful! Please login.');
       navigate('/login');
     } catch (error) {
@@ -30,60 +36,58 @@ function Register() {
           <h2 className="text-center text-3xl font-extrabold text-gray-900">Create your account</h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
+          <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">Username</label>
               <input
-                id="name"
+                id="username"
+                name="username"
                 type="text"
                 required
                 className="input-field"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Enter your username"
+                value={formData.username}
+                onChange={handleChange}
               />
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-              <input
-                id="email"
-                type="email"
-                required
-                className="input-field"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
               <input
                 id="password"
+                name="password"
                 type="password"
                 required
                 className="input-field"
+                placeholder="Enter your password"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={handleChange}
               />
             </div>
             <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700">Role</label>
+              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">Account Type</label>
               <select
                 id="role"
+                name="role"
                 className="input-field"
                 value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                onChange={handleChange}
               >
                 <option value="user">User</option>
                 <option value="admin">Admin</option>
               </select>
             </div>
           </div>
+
           <div>
-            <button type="submit" className="btn-primary w-full">Register</button>
+            <button type="submit" className="btn-primary w-full">
+              Register
+            </button>
           </div>
+          
           <div className="text-center mt-4">
             <p className="text-sm text-gray-600">
               Already have an account?{' '}
-              <Link to="/login" className="font-medium text-primary hover:text-opacity-80">
+              <Link to="/login" className="font-medium text-primary hover:text-secondary">
                 Sign in here
               </Link>
             </p>

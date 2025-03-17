@@ -1,19 +1,26 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../utils/axios';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
+import api from '../api/axios';
 
 function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: ''
   });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post('/api/auth/login', formData);
+      const response = await api.post('/auth/login', formData);
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('role', response.data.role);
       toast.success('Login successful!');
@@ -30,37 +37,45 @@ function Login() {
           <h2 className="text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
+          <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+              <label htmlFor="username" className="sr-only">Username</label>
               <input
-                id="email"
-                type="email"
+                id="username"
+                name="username"
+                type="text"
                 required
                 className="input-field"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="Username"
+                value={formData.username}
+                onChange={handleChange}
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+              <label htmlFor="password" className="sr-only">Password</label>
               <input
                 id="password"
+                name="password"
                 type="password"
                 required
                 className="input-field"
+                placeholder="Password"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={handleChange}
               />
             </div>
           </div>
+
           <div>
-            <button type="submit" className="btn-primary w-full">Sign in</button>
+            <button type="submit" className="btn-primary w-full">
+              Sign in
+            </button>
           </div>
+          
           <div className="text-center mt-4">
             <p className="text-sm text-gray-600">
               Don't have an account?{' '}
-              <Link to="/register" className="font-medium text-primary hover:text-opacity-80">
+              <Link to="/register" className="font-medium text-primary hover:text-secondary">
                 Register here
               </Link>
             </p>

@@ -6,9 +6,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#1a365d",
-        secondary: "#2d3748",
-      },
+        primary: "#1e40af",
+        secondary: "#1d4ed8",
+      }
     },
   },
   plugins: [],
