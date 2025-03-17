@@ -7,14 +7,33 @@ const Book = require("../models/book.model.js");
 const cloudinary = require("../config/cloudinary.js");
 
 const router = express.Router();
-const upload = multer({ dest: "uploads/" }); 
+const upload = multer({ dest: "uploads/" });
 
-router.get("/", getBooks);
+// Get all books with pagination
+router.get("/", async (req, res) => {
+  const page = parseInt(req.query.page) || 1; // Default to page 1
+  const limit = parseInt(req.query.limit) || 10; // Default to 10 books per page
 
+  try {
+    const totalBooks = await Book.countDocuments();
+    const books = await Book.find()
+      .skip((page - 1) * limit) // Skip documents for previous pages
+      .limit(limit); // Limit the number of documents per page
 
+    res.json({
+      books,
+      totalPages: Math.ceil(totalBooks / limit),
+      currentPage: page,
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch books' });
+  }
+});
+
+// Get book details by ID
 router.get("/:id", getBookDetails);
 
-
+// Add a new book
 router.post("/add", auth, isAdmin, upload.single("coverImage"), async (req, res) => {
   const { title, author, genre, publicationYear, description } = req.body;
   const file = req.file; // Uploaded file
@@ -30,15 +49,14 @@ router.post("/add", auth, isAdmin, upload.single("coverImage"), async (req, res)
   try {
     let coverImageUrl = "";
     if (file) {
-
       // Upload image to Cloudinary
       const result = await cloudinary.uploader.upload(file.path, {
         folder: "book_covers",
       });
-      
+
       // Clean up local file after upload
       fs.unlinkSync(file.path);
-      
+
       coverImageUrl = result.secure_url; // Save Cloudinary URL
     }
 
@@ -56,17 +74,18 @@ router.post("/add", auth, isAdmin, upload.single("coverImage"), async (req, res)
     res.status(201).json({ message: "Book added successfully", book });
   } catch (err) {
     console.error("Error adding book:", err);
-    
+
     // Clean up uploaded file if an error occurs
     if (file && fs.existsSync(file.path)) {
       fs.unlinkSync(file.path);
     }
-    
-    res.status(400).json({ 
-      message: "Failed to add book", 
+
+    res.status(400).json({
+      message: "Failed to add book",
       error: err.message,
-      cloudinaryError: err.message.includes("Invalid Signature") ? 
-        "Cloudinary authentication failed. Please check your API credentials." : null
+      cloudinaryError: err.message.includes("Invalid Signature")
+        ? "Cloudinary authentication failed. Please check your API credentials."
+        : null,
     });
   }
 });
