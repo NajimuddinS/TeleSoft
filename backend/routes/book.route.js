@@ -2,11 +2,18 @@ const express = require("express");
 const multer = require("multer");
 const fs = require("fs");
 const { auth, isAdmin } = require("../middlewares/auth.middleware.js");
+const { getBooks, getBookDetails } = require("../controllers/book.controller.js");
 const Book = require("../models/book.model.js");
 const cloudinary = require("../config/cloudinary.js");
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" }); 
+
+router.get("/", getBooks);
+
+
+router.get("/:id", getBookDetails);
+
 
 router.post("/add", auth, isAdmin, upload.single("coverImage"), async (req, res) => {
   const { title, author, genre, publicationYear, description } = req.body;
