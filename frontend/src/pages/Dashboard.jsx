@@ -1,28 +1,47 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../api/axios';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 
 function Dashboard() {
-  const [books, setBooks] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [books, setBooks] = useState([]); // All books fetched from the backend
+  const [currentPage, setCurrentPage] = useState(1); // Current page number
+  const [totalPages, setTotalPages] = useState(1); // Total number of pages
+  const [limit, setLimit] = useState(10); // Number of books per page
+  const [searchQuery, setSearchQuery] = useState(""); // Search query
   const navigate = useNavigate();
-  const isAdmin = localStorage.getItem('role') === 'admin';
+  const isAdmin = localStorage.getItem("role") === "admin";
 
   useEffect(() => {
     fetchBooks();
-  }, [currentPage, limit]);
+  }, [currentPage, limit]); // Fetch books when page or limit changes
 
   const fetchBooks = async () => {
     try {
-      const response = await api.get(`/books?page=${currentPage}&limit=${limit}`);
+      const response = await api.get(
+        `/books?page=${currentPage}&limit=${limit}`
+      );
       setBooks(response.data.books);
       setTotalPages(response.data.totalPages);
     } catch (error) {
-      console.error('Error fetching books:', error);
+      console.error("Error fetching books:", error);
     }
   };
+
+  // Filter books based on search query
+  const filteredBooks = books.filter((book) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      book.title.toLowerCase().includes(query) ||
+      book.author.toLowerCase().includes(query) ||
+      book.genre.toLowerCase().includes(query)
+    );
+  });
+
+  // Paginate the filtered books
+  const paginatedBooks = filteredBooks.slice(
+    (currentPage - 1) * limit, // Start index
+    currentPage * limit // End index
+  );
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -34,18 +53,30 @@ function Dashboard() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    navigate('/login');
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    navigate("/login");
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Library Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Library Dashboard
+          </h1>
 
           <div className="flex items-center gap-4">
+            {/* Search Input */}
+            <input
+              type="text"
+              placeholder="Search by title, author, or genre"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            {/* Logout Button */}
             <button
               onClick={handleLogout}
               className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
@@ -56,7 +87,7 @@ function Dashboard() {
             {/* Add New Book Button (Admin Only) */}
             {isAdmin && (
               <button
-                onClick={() => navigate('/add-book')}
+                onClick={() => navigate("/add-book")}
                 className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
               >
                 Add New Book
@@ -67,7 +98,7 @@ function Dashboard() {
 
         {/* Book Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {books.map((book) => (
+          {paginatedBooks.map((book) => (
             <div
               key={book._id}
               className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"
@@ -127,8 +158,8 @@ function Dashboard() {
                   onClick={() => handlePageChange(page)}
                   className={`flex items-center justify-center px-4 h-10 leading-tight ${
                     currentPage === page
-                      ? 'text-blue-600 border border-blue-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700'
-                      : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700'
+                      ? "text-blue-600 border border-blue-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700"
+                      : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
                   }`}
                 >
                   {page}
