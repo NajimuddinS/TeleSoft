@@ -3,28 +3,32 @@ import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
 function Dashboard() {
-  const [books, setBooks] = useState([]); // All books fetched from the backend
-  const [currentPage, setCurrentPage] = useState(1); // Current page number
-  const [limit, setLimit] = useState(10); // Number of books per page
-  const [searchQuery, setSearchQuery] = useState(""); // Search query
+  const [allBooks, setAllBooks] = useState([]); // Store all books
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true); // Loading state
   const navigate = useNavigate();
   const isAdmin = localStorage.getItem("role") === "admin";
 
   useEffect(() => {
-    fetchBooks();
-  }, [currentPage, limit]); // Fetch books when page or limit changes
+    fetchAllBooks();
+  }, []); 
 
-  const fetchBooks = async () => {
+  const fetchAllBooks = async () => {
     try {
-      const response = await api.get(`/books?page=${currentPage}&limit=${limit}`);
-      setBooks(response.data.books);
+      setIsLoading(true); // Start loading
+      const response = await api.get("/books"); // Fetch all books
+      setAllBooks(response.data.books);
     } catch (error) {
       console.error("Error fetching books:", error);
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
   // Filter books based on search query
-  const filteredBooks = books.filter((book) => {
+  const filteredBooks = allBooks.filter((book) => {
     const query = searchQuery.toLowerCase();
     return (
       book.title.toLowerCase().includes(query) ||
@@ -57,6 +61,17 @@ function Dashboard() {
     navigate("/login");
   };
 
+  // Skeleton Loading Component
+  const SkeletonLoader = () => (
+    <div className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+      <div className="w-full h-80 bg-gray-300"></div> {/* Image placeholder */}
+      <div className="p-4">
+        <div className="h-6 bg-gray-300 rounded mb-2 w-3/4"></div> {/* Title placeholder */}
+        <div className="h-4 bg-gray-300 rounded w-1/2"></div> {/* Author placeholder */}
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-7xl mx-auto">
@@ -69,7 +84,10 @@ function Dashboard() {
               type="text"
               placeholder="Search by title, author, or genre"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1); // Reset to the first page when search query changes
+              }}
               className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
@@ -94,29 +112,31 @@ function Dashboard() {
         </div>
 
         {/* Book Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {paginatedBooks.map((book) => (
-            <div
-              key={book._id}
-              className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"
-              onClick={() => navigate(`/book/${book._id}`)}
-            >
-              {/* Cover Image */}
-              <img
-                src={book.coverImage}
-                alt={book.title}
-                className="w-full h-min object-cover"
-              />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {isLoading
+            ? Array.from({ length: limit }).map((_, index) => (
+                <SkeletonLoader key={index} /> // Show skeleton while loading
+              ))
+            : paginatedBooks.map((book) => (
+                <div
+                  key={book._id}
+                  className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => navigate(`/book/${book._id}`)}
+                >
+                  {/* Cover Image */}
+                  <img
+                    src={book.coverImage}
+                    alt={book.title}
+                    className="w-full h-80 object-cover"
+                  />
 
-              {/* Book Details */}
-              <div className="p-6">
-                <h2 className="text-xl font-semibold mb-2">{book.title}</h2>
-                <p className="text-gray-600">Author: {book.author}</p>
-                <p className="text-gray-600">Genre: {book.genre}</p>
-                <p className="text-gray-600">Year: {book.publicationYear}</p>
-              </div>
-            </div>
-          ))}
+                  {/* Book Details */}
+                  <div className="p-4">
+                    <h2 className="text-lg font-semibold mb-1">{book.title}</h2>
+                    <p className="text-sm text-gray-600">Author: {book.author}</p>
+                  </div>
+                </div>
+              ))}
         </div>
 
         {/* Pagination */}
