@@ -5,7 +5,6 @@ import api from "../api/axios";
 function Dashboard() {
   const [books, setBooks] = useState([]); // All books fetched from the backend
   const [currentPage, setCurrentPage] = useState(1); // Current page number
-  const [totalPages, setTotalPages] = useState(1); // Total number of pages
   const [limit, setLimit] = useState(10); // Number of books per page
   const [searchQuery, setSearchQuery] = useState(""); // Search query
   const navigate = useNavigate();
@@ -17,11 +16,8 @@ function Dashboard() {
 
   const fetchBooks = async () => {
     try {
-      const response = await api.get(
-        `/books?page=${currentPage}&limit=${limit}`
-      );
+      const response = await api.get(`/books?page=${currentPage}&limit=${limit}`);
       setBooks(response.data.books);
-      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error fetching books:", error);
     }
@@ -36,6 +32,9 @@ function Dashboard() {
       book.genre.toLowerCase().includes(query)
     );
   });
+
+  // Recalculate totalPages based on filtered books
+  const totalPages = Math.ceil(filteredBooks.length / limit);
 
   // Paginate the filtered books
   const paginatedBooks = filteredBooks.slice(
@@ -62,9 +61,7 @@ function Dashboard() {
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Library Dashboard
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900">Library Dashboard</h1>
 
           <div className="flex items-center gap-4">
             {/* Search Input */}

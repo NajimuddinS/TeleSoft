@@ -11,19 +11,10 @@ const upload = multer({ dest: "uploads/" });
 
 // Get all books with pagination
 router.get("/", async (req, res) => {
-  const page = parseInt(req.query.page) || 1; // Default to page 1
-  const limit = parseInt(req.query.limit) || 10; // Default to 10 books per page
-
   try {
-    const totalBooks = await Book.countDocuments();
     const books = await Book.find()
-      .skip((page - 1) * limit) // Skip documents for previous pages
-      .limit(limit); // Limit the number of documents per page
-
     res.json({
-      books,
-      totalPages: Math.ceil(totalBooks / limit),
-      currentPage: page,
+      books
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch books' });
