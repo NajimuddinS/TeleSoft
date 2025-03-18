@@ -77,7 +77,7 @@ function Dashboard() {
               <img
                 src={book.coverImage}
                 alt={book.title}
-                className="w-full h-48 object-cover"
+                className="w-full h-min object-cover"
               />
 
               {/* Book Details */}
