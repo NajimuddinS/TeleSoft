@@ -6,13 +6,13 @@ function Dashboard() {
   const [books, setBooks] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [limit, setLimit] = useState(10); // Number of books per page
+  const [limit, setLimit] = useState(10);
   const navigate = useNavigate();
   const isAdmin = localStorage.getItem('role') === 'admin';
 
   useEffect(() => {
     fetchBooks();
-  }, [currentPage, limit]); // Fetch books when page or limit changes
+  }, [currentPage, limit]);
 
   const fetchBooks = async () => {
     try {
@@ -46,7 +46,6 @@ function Dashboard() {
           <h1 className="text-3xl font-bold text-gray-900">Library Dashboard</h1>
 
           <div className="flex items-center gap-4">
-            {/* Logout Button */}
             <button
               onClick={handleLogout}
               className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"

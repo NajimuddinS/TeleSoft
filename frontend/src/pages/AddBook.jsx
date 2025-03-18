@@ -45,7 +45,7 @@ function AddBook() {
         form.append('coverImage', coverImage);
       }
 
-      await api.post('/api/add-book', form, {
+      await api.post('/add-book', form, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
