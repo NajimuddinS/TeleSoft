@@ -46,10 +46,21 @@ function BookDetails() {
     }
   }, [book, allBooks]);
 
+  // Spinner Component
+  const Spinner = () => (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  );
+
+  if (isLoading) {
+    return <Spinner />; // Show spinner while loading
+  }
+
   if (!book) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading...</div>
+        <div className="text-xl">Book not found</div>
       </div>
     );
   }
@@ -137,7 +148,7 @@ function BookDetails() {
 
             <div className="flex justify-between items-center mb-4">
               <button onClick={() => navigate('/dashboard')} className="text-blue-600 hover:text-blue-800">
-                Back to All Booka
+                Back to All Books
               </button>
             </div>
           </div>
