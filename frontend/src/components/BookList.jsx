@@ -29,11 +29,25 @@ export default function BookList() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`https://telesoft-2ubl.onrender.com/api/books/delete/${id}`);
+      const token = localStorage.getItem('token'); // Get the token from localStorage
+      if (!token) {
+        toast.error('You are not authorized to perform this action');
+        return;
+      }
+
+      await axios.delete(`https://telesoft-2ubl.onrender.com/api/books/delete/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Add the token to the headers
+        },
+      });
+
       toast.success('Book deleted successfully');
       fetchBooks();
     } catch (error) {
       console.error('Error deleting book:', error);
+      if (error.response) {
+        console.error('Backend response:', error.response.data);
+      }
       toast.error('Failed to delete book');
     }
   };
@@ -48,7 +62,7 @@ export default function BookList() {
       <table className="min-w-full bg-white">
         <thead className="bg-gray-100">
           <tr>
-            <th className="px-6 py-3 text-left">Cover</th> {/* New column for the cover image */}
+            <th className="px-6 py-3 text-left">Cover</th>
             <th className="px-6 py-3 text-left">Title</th>
             <th className="px-6 py-3 text-left">Author</th>
             <th className="px-6 py-3 text-left">Genre</th>

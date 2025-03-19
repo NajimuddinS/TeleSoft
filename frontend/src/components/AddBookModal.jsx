@@ -15,16 +15,24 @@ export default function AddBookModal({ isOpen, onClose, onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
+      const token = localStorage.getItem('token'); // Get the token from localStorage
+      if (!token) {
+        toast.error('You are not authorized to perform this action');
+        return;
+      }
+
       const formDataToSend = new FormData();
-      Object.keys(formData).forEach(key => {
+      Object.keys(formData).forEach((key) => {
         formDataToSend.append(key, formData[key]);
       });
-      
+
       if (selectedFile) {
         formDataToSend.append('coverImage', selectedFile);
       }
+
+      console.log([...formDataToSend.entries()]); // Debug FormData
 
       await axios.post(
         'https://telesoft-2ubl.onrender.com/api/books/add',
@@ -32,15 +40,19 @@ export default function AddBookModal({ isOpen, onClose, onSuccess }) {
         {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`, // Add the token to the headers
           },
         }
       );
-      
+
       toast.success('Book added successfully');
       onSuccess();
       onClose();
     } catch (error) {
       console.error('Error adding book:', error);
+      if (error.response) {
+        console.error('Backend response:', error.response.data);
+      }
       toast.error('Failed to add book');
     }
   };
@@ -71,7 +83,7 @@ export default function AddBookModal({ isOpen, onClose, onSuccess }) {
                 required
               />
             </div>
-            
+
             <div>
               <label className="block text-gray-700 text-sm font-bold mb-2">
                 Author

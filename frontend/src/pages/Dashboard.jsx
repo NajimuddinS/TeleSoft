@@ -7,9 +7,27 @@ function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedGenre, setSelectedGenre] = useState("All"); // Track selected genre
   const [isLoading, setIsLoading] = useState(true); // Loading state
   const navigate = useNavigate();
   const isAdmin = localStorage.getItem("role") === "admin";
+
+  // List of genres
+  const genres = [
+    "All",
+    "Fiction",
+    "Non-Fiction",
+    "Mystery",
+    "Romance",
+    "Thriller",
+    "Fantasy",
+    "Horror",
+    "Anime",
+    "Action",
+    "Drama",
+    "Adventure",
+    "Martial Arts",
+  ];
 
   useEffect(() => {
     // Redirect admin users to the admin panel
@@ -17,9 +35,9 @@ function Dashboard() {
       navigate("/admin");
       return;
     }
-    
+
     fetchAllBooks();
-  }, []); 
+  }, []);
 
   const fetchAllBooks = async () => {
     try {
@@ -33,14 +51,18 @@ function Dashboard() {
     }
   };
 
-  // Filter books based on search query
+  // Filter books based on search query and selected genre
   const filteredBooks = allBooks.filter((book) => {
     const query = searchQuery.toLowerCase();
-    return (
+    const matchesSearch =
       book.title.toLowerCase().includes(query) ||
       book.author.toLowerCase().includes(query) ||
-      book.genre.toLowerCase().includes(query)
-    );
+      book.genre.toLowerCase().includes(query);
+
+    const matchesGenre =
+      selectedGenre === "All" || book.genre === selectedGenre;
+
+    return matchesSearch && matchesGenre;
   });
 
   // Recalculate totalPages based on filtered books
@@ -64,7 +86,7 @@ function Dashboard() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
-    navigate("/login");
+    navigate("/");
   };
 
   // Skeleton Loading Component
@@ -105,6 +127,26 @@ function Dashboard() {
               Logout
             </button>
           </div>
+        </div>
+
+        {/* Genre Filters */}
+        <div className="flex flex-wrap gap-2 mb-8">
+          {genres.map((genre) => (
+            <button
+              key={genre}
+              onClick={() => {
+                setSelectedGenre(genre);
+                setCurrentPage(1); // Reset to the first page when genre changes
+              }}
+              className={`px-4 py-2 rounded-md ${
+                selectedGenre === genre
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
+              }`}
+            >
+              {genre}
+            </button>
+          ))}
         </div>
 
         {/* Book Grid */}
@@ -211,4 +253,5 @@ function Dashboard() {
     </div>
   );
 }
+
 export default Dashboard;

@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Righteous&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,4 +15,8 @@
   .btn-secondary {
     @apply px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors duration-300;
   }
+}
+
+.font {
+  font-family: "Righteous", sans-serif;
 }

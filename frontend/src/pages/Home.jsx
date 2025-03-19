@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import '../App.css'
 
 const Home = () => {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const carouselImages = [
-    "https://www.bookswagon.com/bannerimages/81_inr.jpg?v=3.6",
     "https://www.bookswagon.com/bannerimages/2_inr.jpg?v=3.6",
+    "https://www.bookswagon.com/bannerimages/81_inr.jpg?v=3.6",
     "https://www.bookswagon.com/bannerimages/85_inr.jpg?v=3.6",
     "https://www.bookswagon.com/bannerimages/70_inr.jpg?v=3.6",
     "https://www.bookswagon.com/bannerimages/79_inr.jpg?v=3.6"
@@ -72,7 +73,7 @@ const Home = () => {
                   }}  
                 />
               </Link>
-              <span className="ml-2 text-2xl font-bold text-gray-900">LibHub</span>
+              <span className="ml-2 text-2xl font-bold text-gray-900 font">LibHub</span>
             </div>
             
             <div className="flex items-center">
