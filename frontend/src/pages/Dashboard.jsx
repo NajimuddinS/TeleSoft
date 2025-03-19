@@ -12,6 +12,12 @@ function Dashboard() {
   const isAdmin = localStorage.getItem("role") === "admin";
 
   useEffect(() => {
+    // Redirect admin users to the admin panel
+    if (isAdmin) {
+      navigate("/admin");
+      return;
+    }
+    
     fetchAllBooks();
   }, []); 
 
@@ -98,16 +104,6 @@ function Dashboard() {
             >
               Logout
             </button>
-
-            {/* Add New Book Button (Admin Only) */}
-            {isAdmin && (
-              <button
-                onClick={() => navigate("/add-book")}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
-              >
-                Add New Book
-              </button>
-            )}
           </div>
         </div>
 
@@ -215,5 +211,4 @@ function Dashboard() {
     </div>
   );
 }
-
 export default Dashboard;
