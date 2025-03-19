@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model.js");
+const { auth, isAdmin } = require("../middlewares/auth.middleware.js"); // Import middleware
 const router = express.Router();
 
 // Register
@@ -31,5 +32,14 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// Get all users (protected route, admin only)
+router.get("/getusers", auth, isAdmin, async (req, res) => {
+  try {
+    const users = await User.find({}, { password: 0 }); // Exclude passwords from the response
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch users", error: err.message });
+  }
+});
 
 module.exports = router;
