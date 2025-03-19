@@ -11,6 +11,7 @@ export default function BookList() {
   const [editingBook, setEditingBook] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
 
   useEffect(() => {
     fetchBooks();
@@ -18,12 +19,15 @@ export default function BookList() {
 
   const fetchBooks = async () => {
     try {
+      setIsLoading(true); // Start loading
       const response = await axios.get('https://telesoft-2ubl.onrender.com/api/books');
       setBooks(Array.isArray(response.data) ? response.data : response.data.books || []);
     } catch (error) {
       console.error('Error fetching books:', error);
       toast.error('Failed to fetch books');
       setBooks([]);
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -57,6 +61,13 @@ export default function BookList() {
     setIsEditModalOpen(true);
   };
 
+  // Spinner Component
+  const Spinner = () => (
+    <div className="flex items-center justify-center min-h-[200px]">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  );
+
   const TableView = () => (
     <div className="overflow-x-auto">
       <table className="min-w-full bg-white">
@@ -71,7 +82,13 @@ export default function BookList() {
           </tr>
         </thead>
         <tbody>
-          {books && books.length > 0 ? (
+          {isLoading ? (
+            <tr>
+              <td colSpan="6">
+                <Spinner />
+              </td>
+            </tr>
+          ) : books && books.length > 0 ? (
             books.map((book) => (
               <tr key={book._id} className="border-b">
                 <td className="px-6 py-4">
@@ -121,7 +138,11 @@ export default function BookList() {
 
   const GridView = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {books && books.length > 0 ? (
+      {isLoading ? (
+        <div className="col-span-full">
+          <Spinner />
+        </div>
+      ) : books && books.length > 0 ? (
         books.map((book) => (
           <div key={book._id} className="bg-white p-6 rounded-lg shadow-md">
             {book.coverImage && (

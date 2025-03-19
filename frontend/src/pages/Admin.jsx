@@ -13,7 +13,6 @@ function Admin() {
       <div className="flex-1">
         {activeSection === 'books' ? <BookList /> : <UserList />}
       </div>
-      <Toaster position="top-right" />
     </div>
   );
 }
